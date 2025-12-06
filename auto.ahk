@@ -113,18 +113,29 @@ Numpad7::
                 Sleep, 250
                 Send, {Enter}
 
-          ; ⏳ WAIT UNTIL NEW IMAGE LOADS
-          Loop 30 {
-               PixelGetColor, px, %xCoord%, %yCoord%, RGB
-               if (px != oldPx)    ; jab pixel color change mile → new image loaded
-                   break
-               Sleep, 100
-         }
-               Sleep, 250
+                ; ⏳ RELIABLE WAIT FOR IMAGE LOAD (checks for pixel color change at Point 2)
+                p2x := pointX[2]
+                p2y := pointY[2]
+                PixelGetColor, initialColor, %p2x%, %p2y%
 
-         }
-            
-           
+                Loop, 100 ; Timeout after 10 seconds (100 * 100ms)
+                {
+                    Sleep, 100
+                    PixelGetColor, currentColor, %p2x%, %p2y%
+                    if (currentColor != initialColor)
+                    {
+                        ; Color has changed, so the image has likely loaded.
+                        break
+                    }
+                    if (A_Index = 100)
+                    {
+                        MsgBox, Image did not appear to load in time. Script will continue, but may fail.
+                    }
+                }
+                Sleep, 250
+            }
+
+
           if (idx = 2)
            {
              ; TRIPLE CLICK
@@ -206,5 +217,3 @@ JumpBtoNextA() {
     Send, {Down}
     Sleep, 100
 }
-
-
