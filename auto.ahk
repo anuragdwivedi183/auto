@@ -111,18 +111,9 @@ Numpad7::
                 Sleep, 250
                 Send, ^v            ; paste image name
                 Sleep, 250
-                Send, {Enter}
-
-          ; ⏳ WAIT UNTIL NEW IMAGE LOADS
-          Loop 30 {
-               PixelGetColor, px, %xCoord%, %yCoord%, RGB
-               if (px != oldPx)    ; jab pixel color change mile → new image loaded
-                   break
-               Sleep, 100
-         }
-               Sleep, 250
-
-         }
+                Send, {Enter}       ; select/open image
+                Sleep, 800
+            }
             
            
           if (idx = 2)
@@ -130,7 +121,8 @@ Numpad7::
              ; TRIPLE CLICK
                Sleep, 120
                Click, %xCoord%, %yCoord%, 3
-               Sleep, 350
+               Sleep, 200
+               Sleep, 500
 
            }
 
@@ -206,5 +198,6 @@ JumpBtoNextA() {
     Send, {Down}
     Sleep, 100
 }
+
 
 
