@@ -35,11 +35,34 @@ Numpad3::
     MsgBox, % "Saved COPY Point (Point " pointCount ") at X=" mx " Y=" my
 return
 
+; ---------- SAVE WAIT POINT (PIXEL COLOR) ----------
+; Use this to save a pixel's color that indicates the image has loaded.
+; Press Numpad4 at a pixel that is only the correct color when the image is fully loaded.
+Numpad4::
+    MouseGetPos, mx, my
+    PixelGetColor, color, %mx%, %my%
+    waitPointX := mx
+    waitPointY := my
+    waitPointColor := color
+    MsgBox, % "Saved WAIT Point at X=" mx " Y=" my " with Color=" color
+return
+
+; ---------- CLEAR WAIT POINT ----------
+Numpad5::
+    waitPointX := ""
+    waitPointY := ""
+    waitPointColor := ""
+    MsgBox, Wait point cleared!
+return
+
 ; CLEAR
 Numpad0::
     pointX := []
     pointY := []
     pointCount := 0
+    waitPointX := ""
+    waitPointY := ""
+    waitPointColor := ""
     MsgBox, All points cleared!
 return
 
@@ -61,6 +84,10 @@ Numpad7::
     }
     if (!repeatCount) {
         MsgBox, Repeat count Numpad8 se set karo!
+        return
+    }
+    if (!waitPointX || !waitPointY) {
+        MsgBox, Numpad4 se WAIT point set karo! (For image load wait)
         return
     }
 
@@ -112,10 +139,25 @@ Numpad7::
                 Send, ^v            ; paste image name
                 Sleep, 250
                 Send, {Enter}       ; select/open image
-                Sleep, 800
+
+                ; --- WAIT FOR IMAGE WINDOW ---
+                ; This loop waits for the pixel at the wait point to match the saved color.
+                ; If the color doesn't match after 10 seconds, the script will stop.
+                startTime := A_TickCount
+                Loop {
+                    PixelGetColor, currentColor, %waitPointX%, %waitPointY%
+                    if (currentColor = waitPointColor)
+                        break ; Color matches, continue
+                    if (A_TickCount - startTime > 10000) ; 10-second timeout
+                    {
+                        MsgBox, WAIT TIMEOUT! Image window did not load in time.
+                        ExitApp
+                    }
+                    Sleep, 200 ; Check every 200ms
+                }
             }
-            
-           
+
+
           if (idx = 2)
            {
              ; TRIPLE CLICK
@@ -198,7 +240,3 @@ JumpBtoNextA() {
     Send, {Down}
     Sleep, 100
 }
-
-
-
-
