@@ -144,8 +144,6 @@ Numpad7::
         Send, ^+{Tab}
         Sleep, 400
 ; ----- HARD FIX: STOP SKIP -----
-        Send, {Up}
-        Sleep, 150
 
         ; ----------------- STEP 5: PASTE NEXT CELL -----------------
         Send, {Right}
